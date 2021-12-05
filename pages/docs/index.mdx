@@ -1,0 +1,50 @@
+export { ContainerLayout as default } from '../../components/Layout';
+
+# ABR Brush Viewer/Exporter
+
+## What is it?
+
+An online tool to view and export brush images from .abr files.
+No installation necessary and parsing and export happens entirely in your browser.
+
+Some caveats: very old .abr files are not supported. So far the limited collections of brush files I've
+tested have worked, but there may be ones that can't be parsed for some reason.
+
+Only the brush "sample" images are exported. Currently this does not extract any brush parameters like jitter,
+radius, etc.
+
+## What's the output?
+
+Grayscale PNG images intended to be used as alpha masks. Black represents full transparency and white
+represents full opacity. The images themselves don't have transparency.
+
+You can use "save as" to download individual images, or the export button to download all of them to a zip.
+
+## How do I use alpha masks in Blender for texture painting?
+
+More detailed explanation and screenshots to be added later, but roughly:
+
+1. Create a new brush
+2. Under **Brush Settings > Texture** click the **+ New** button
+3. Next to the newly created texture name, click on the rightmost button that looks like two toggle sliders
+4. You should now be on the Texture tab (red checkerbox icon). Under **Image** > **Settings** click the Open button
+5. Select your brush image in the file browser
+6. Expand the **Alpha** section and make sure **Calculate** is checked
+7. You can now go back to the brush settings and adjust the mapping type, stroke, etc.
+
+You can also use addons like BPainter or PBR Painter make this workflow quicker.
+
+## How do I use alpha masks in ArmorPaint?
+
+Under brushes, click import and select your brush PNG.
+
+## Help, I encountered a bug or a .abr file that couldn't be parsed
+
+File a ticket on the [project issue tracker](https://github.com/jlai/brush-viewer/issues/new). Include the error message,
+if any, and your browser/OS. Mention if the issue occurs for specific abr files or for your browser in general.
+
+Do not attach any .abr files unless you created them yourself. If it's freely available online (or reasonably cheap),
+mention where you can download it from rather than attaching the file.
+
+If you like this project, feel free to leave a comment in the
+[public Github discussions](https://github.com/jlai/brush-viewer/discussions)

@@ -1,0 +1,65 @@
+.dropArea {
+  border: 4px dashed lightgray;
+  margin: 24px;
+  padding: 24px;
+  display: flex;
+
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+
+  position: relative;
+}
+
+.dropArea.highlighted {
+  border-color: lightskyblue;
+}
+
+.cover {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: white;
+  flex: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  opacity: 0;
+  pointer-events: none;
+}
+
+.enter {
+  opacity: 1.0;
+  pointer-events: inherit;
+}
+
+.enterActive {
+  opacity: 1.0;
+  pointer-events: inherit;
+  transition: opacity 1000ms;
+}
+
+.enterDone {
+  opacity: 1.0;
+  pointer-events: inherit;
+}
+
+.exit {
+  opacity: 1.0;
+  pointer-events: inherit;
+}
+
+.exitActive {
+  opacity: 0;
+  pointer-events: inherit;
+  transition: opacity 1000ms;
+}
+
+.loadingArea {
+  width: 60%;
+}

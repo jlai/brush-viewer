@@ -1,0 +1,44 @@
+{
+  "name": "abr-extract-web",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "export": "next export",
+    "deploy": "next build && next export && gh-pages -d out"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.7.0",
+    "@emotion/styled": "^11.6.0",
+    "@mdx-js/loader": "^2.0.0-rc.2",
+    "@mui/icons-material": "^5.2.0",
+    "@mui/material": "^5.2.2",
+    "@next/mdx": "^12.0.7",
+    "@types/file-saver": "^2.0.4",
+    "@types/lodash": "^4.14.177",
+    "comlink": "^4.3.1",
+    "fast-png": "^6.1.0",
+    "file-saver": "^2.0.5",
+    "gh-pages": "^3.2.3",
+    "jszip": "^3.7.1",
+    "kaitai-struct": "^0.9.0",
+    "lodash": "^4.17.21",
+    "next": "12.0.7",
+    "react": "17.0.2",
+    "react-dnd": "^14.0.4",
+    "react-dnd-html5-backend": "^14.0.2",
+    "react-dom": "17.0.2",
+    "use-file-picker": "^1.4.1",
+    "zustand": "^3.6.6"
+  },
+  "devDependencies": {
+    "@types/node": "16.11.11",
+    "@types/react": "17.0.37",
+    "@types/react-image-gallery": "^1.0.5",
+    "eslint": "8.4.0",
+    "eslint-config-next": "12.0.7",
+    "typescript": "4.5.2"
+  }
+}

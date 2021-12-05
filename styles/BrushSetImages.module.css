@@ -1,0 +1,7 @@
+.tooltip {
+  text-align: center;
+}
+
+.tooltip div:first-child {
+  margin-bottom: 4px;
+}
