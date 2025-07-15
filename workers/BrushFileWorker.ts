@@ -112,7 +112,7 @@ export const workerApi = {
         imageName.replace(/\.png$/, ` (${sample.brushId}).png`);
       }
 
-      zip.file(imageName, data, {
+      zip.file(imageName, data!, {
         date: file.lastModified ? new Date(file.lastModified) : undefined
       });
 

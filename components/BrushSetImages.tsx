@@ -43,7 +43,7 @@ const BrushCard: React.FC<{
 
   const title = (
     <div className={styles.tooltip}>
-      <div className={styles["tooltip-big"]}>Brush {brush.brushNum} {name ? <> &ndash; "{name}"</> : null}</div>
+      <div className={styles["tooltip-big"]}>Brush {brush.brushNum} {name ? <> &ndash; {name}</> : null}</div>
       <div>{brush.width} x {brush.height}</div>
     </div>
   );

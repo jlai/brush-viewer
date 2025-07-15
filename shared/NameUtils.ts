@@ -9,9 +9,13 @@ export function getImageFileName(pattern: string, exportName: string, brushName:
 
   return pattern
     .replace(/%f/g, exportName)
-    .replace(/%b/g, brushName ?? num.toString(10))
+    .replace(/%b/g, (brushName && cleanupBrushName(brushName)) ?? num.toString(10))
     .replace(/%([0-9]?)n/g, formatBrushNum)
     .replace(/%%/g, '%') + '.png';
+}
+
+export function cleanupBrushName(brushName: string) {
+  return brushName.replace(/[/\\"|:*?<>]/g, '');
 }
 
 export function validatePattern(pattern: string) {
