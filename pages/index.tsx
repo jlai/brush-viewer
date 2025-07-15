@@ -1,3 +1,5 @@
+'use client';
+
 import type { NextPage } from 'next'
 import styles from '../styles/Home.module.css'
 import AbrFileLoader from '../components/BrushFilePicker';
