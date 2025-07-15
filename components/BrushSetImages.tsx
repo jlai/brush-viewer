@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
 import Image, { ImageLoader } from 'next/image';
-import Link from 'next/link';
 import Tooltip from '@mui/material/Tooltip';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
@@ -31,7 +30,8 @@ const BrushImage: React.FC<{
         unoptimized
         loader={loader}
         alt={`Brush ${brush.brushNum}`}
-        objectFit="scale-down" objectPosition="center center" />
+        style={{objectFit: "scale-down", objectPosition: "center center"}}
+        />
     </a>
   );
 };
