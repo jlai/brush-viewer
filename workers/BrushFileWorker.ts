@@ -21,6 +21,8 @@ export type BrushRef = {
   width: number;
   height: number;
   brushNum: number;
+  brushName?: string;
+  brushData?: Record<string, any>;
 };
 
 export type ExportOptions = {
@@ -61,7 +63,9 @@ export const workerApi = {
           url: sample.createBlobURL(),
           width: sample.width,
           height: sample.height,
-          brushNum: sample.index + 1
+          brushNum: sample.index + 1,
+          brushName: sample.brushName,
+          brushData: sample.brushData
         });
 
         info.decodedBrushes += 1;
@@ -96,15 +100,23 @@ export const workerApi = {
     const totalBrushes = brushFile.samples.length;
 
     let brushNum = 0;
+    const usedNames = new Set();
     for (const sample of brushFile.samples) {
       brushNum += 1;
 
       const data = sample.getOrCreatePNG();
-      const imageName = getImageFileName(imageNamePattern, exportName, brushNum, totalBrushes);
+      let imageName = getImageFileName(imageNamePattern, exportName, sample.brushName, brushNum, totalBrushes);
+
+      if (usedNames.has(imageName)) {
+        // force unique name
+        imageName.replace(/\.png$/, ` (${sample.brushId}).png`);
+      }
 
       zip.file(imageName, data, {
         date: file.lastModified ? new Date(file.lastModified) : undefined
       });
+
+      usedNames.add(imageName);
     }
 
     const buffer = await zip.generateAsync({ type: 'arraybuffer' });

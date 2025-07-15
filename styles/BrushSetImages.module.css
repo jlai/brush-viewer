@@ -5,3 +5,7 @@
 .tooltip div:first-child {
   margin-bottom: 4px;
 }
+
+.tooltip-big {
+  font-size: larger;
+}

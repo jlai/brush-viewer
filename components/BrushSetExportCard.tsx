@@ -14,11 +14,15 @@ import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import InputAdornment from '@mui/material/InputAdornment';
 
-import { useStore } from "../stores/store";
+import { type BrushExtractorStore, useStore } from "../stores/store";
 import SettingsDialog from './SettingsDialog';
 
+function getExampleBrushName(state: BrushExtractorStore) {
+  return state.brushes?.[0]?.brushName
+}
+
 const ExampleFileNamePreview = () => {
-  const exampleFileName = useStore(state => state.getImageFileName(1));
+  const exampleFileName = useStore(state => state.getImageFileName(1, getExampleBrushName(state)));
   const [settingsOpen, setSettingsOpen] = useState(false);
   const openSettings = useCallback(() => setSettingsOpen(true), [setSettingsOpen]);
   const closeSettings = useCallback(() => setSettingsOpen(false), [setSettingsOpen]);

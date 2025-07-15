@@ -48,6 +48,7 @@ const PatternEditor: React.FC<{
 );
 
 const EXAMPLE_PATTERNS = [
+    '%f/%b',
     '%f/%f - %n',
     '%f/%n - %f',
     'Brush %0n'
@@ -86,6 +87,7 @@ const SettingsDialog: React.FC<{
                     <Box sx={{ mb: '16px' }}>
                         <Typography variant="h6">Set the pattern used to name image files</Typography>
                         <DialogContentText><code>%f</code> - brush set name</DialogContentText>
+                        <DialogContentText><code>%b</code> - brush name, if present, otherwise number</DialogContentText>
                         <DialogContentText><code>%n</code> - brush number (automatic leading zeroes)</DialogContentText>
                         <DialogContentText><code>%0n</code> - brush number (no leading zeroes)</DialogContentText>
                         <DialogContentText><code>%3n</code> - brush number (zero-padded to 3 digits)</DialogContentText>

@@ -13,7 +13,7 @@ const loader: ImageLoader = ({ src }) => src;
 const BrushImage: React.FC<{
   brush: BrushRef
 }> = ({ brush }) => {
-  const fileName = useStore(state => state.getImageFileName(brush.brushNum));
+  const fileName = useStore(state => state.getImageFileName(brush.brushNum, brush.brushName));
   const trimmedFileName = fileName?.replace(/^.*\//g, '');
 
   const onClick = useCallback((e) => {
@@ -39,9 +39,11 @@ const BrushImage: React.FC<{
 const BrushCard: React.FC<{
   brush: BrushRef
 }> = ({ brush }) => {
+  const name = brush.brushName;
+
   const title = (
     <div className={styles.tooltip}>
-      <div>Brush {brush.brushNum}</div>
+      <div className={styles["tooltip-big"]}>Brush {brush.brushNum} {name ? <> &ndash; "{name}"</> : null}</div>
       <div>{brush.width} x {brush.height}</div>
     </div>
   );

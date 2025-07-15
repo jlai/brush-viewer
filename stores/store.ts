@@ -34,7 +34,7 @@ export type BrushExtractorStore = {
   getDefaultExportName(): string;
   setImageNamePattern(pattern: string): void;
   setShowingExportSettings(showing: boolean): void;
-  getImageFileName(num: number): string;
+  getImageFileName(num: number, brushName?: string): string;
   exportToZip(): Promise<void>;
 };
 
@@ -136,10 +136,10 @@ export const useStore = create<BrushExtractorStore>(persist((
     return fileName?.replace(/.abr$/i, '') || '';
   },
 
-  getImageFileName(num: number) {
+  getImageFileName(num: number, brushName: string) {
     const { getExportName, imageNamePattern, fileInfo } = get();
 
-    return getImageFileName(imageNamePattern, getExportName(), num, fileInfo?.totalBrushes || 0);
+    return getImageFileName(imageNamePattern, getExportName(), brushName, num, fileInfo?.totalBrushes || 0);
   },
 
   setImageNamePattern(pattern: string) {

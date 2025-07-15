@@ -1,6 +1,6 @@
-import KaitaiStream from 'kaitai-struct/KaitaiStream';
-import Abr from './Abr';
-import { decodeToPNG } from './BitmapDecoder';
+import KaitaiStream from "kaitai-struct/KaitaiStream";
+import Abr from "./Abr";
+import { decodeToPNG } from "./BitmapDecoder";
 
 export class AbrBrushFile {
   constructor(data) {
@@ -13,22 +13,85 @@ export class AbrBrushFile {
       const subversion = headerView.getUint16(0);
 
       if (version < 6 || version > 10) {
-        throw new Error(`unsupported ABR version (or not a ABR file): version ${version}.${subversion}`);
+        throw new Error(
+          `unsupported ABR version (or not a ABR file): version ${version}.${subversion}`
+        );
       }
 
-      throw new Error(`error parsing file structure [v${version}.${subversion}]: ${e.message}`);
+      throw new Error(
+        `error parsing file structure [v${version}.${subversion}]: ${e.message}`
+      );
     }
 
     this.samples = [];
+    this.samplesById = new Map();
+    this.brushDataById = new Map();
     this.version = this.abr.header.version;
     this.subversion = this.abr.header.subversion;
 
     for (const section of this.abr.sections) {
       if (section.body instanceof Abr.SamplesSectionBody) {
-        this.samples = section.body.samples
-          .map((sample, i) => new AbrSampleBrush(sample.data, i));
+        const samplesData = section.body.samples;
+        for (let i = 0; i < samplesData.length; i++) {
+          const sample = new AbrSampleBrush(samplesData[i].data, i);
+          this.samplesById.set(sample.brushId, sample);
+          this.samples.push(sample);
+        }
+      }
+
+      if (section.body instanceof Abr.DescriptorsSectionBody) {
+        const parsed = this.parseDescriptor(section.body);
+        for (const brushData of parsed.Brsh || []) {
+          const brushId = brushData.Brsh.sampledData;
+          this.brushDataById.set(brushId, brushData);
+        }
       }
     }
+
+    for (const [brushId, sample] of this.samplesById.entries()) {
+      const brushData = this.brushDataById.get(brushId);
+      if (brushData) {
+        sample.setBrushData(brushData);
+      }
+    }
+  }
+
+  parseDescriptor(descriptor) {
+    const obj = {};
+    for (const keyedItem of descriptor.keyedItems) {
+      const key = keyedItem.key.text;
+      obj[key] = this.parseValue(keyedItem.item);
+    }
+
+    return obj;
+  }
+
+  cleanString(text) {
+    return text.replace(/(\u0000|\x00)+$/g, "")
+  }
+
+  parseValue(typedValue) {
+    const value = typedValue.value;
+
+    if (typeof value === "number") {
+      return value;
+    } else if (
+      value instanceof Abr.UnicodeString ||
+      value instanceof Abr.PascalStringU4 ||
+      value instanceof Abr.CompactString
+    ) {
+      return this.cleanString(value.text);
+    } else if (value instanceof Abr.DescriptorList) {
+      return value.items.map((typedValue) => this.parseValue(typedValue));
+    } else if (value instanceof Abr.Descriptor) {
+      return this.parseDescriptor(value);
+    } else if (value instanceof Abr.UnitFloatValue) {
+      return value.value;
+    } else if (value instanceof Abr.EnumeratedValue) {
+      return this.cleanString(value.enum.text);
+    }
+
+    return value;
   }
 
   cleanup() {
@@ -38,8 +101,13 @@ export class AbrBrushFile {
   }
 }
 
+const ASCII_DECODER = new TextDecoder("ASCII");
+
 export class AbrSampleBrush {
   constructor(sampleData, index) {
+    this.brushData = {};
+    this.brushName = undefined;
+    this.brushId = ASCII_DECODER.decode(sampleData.brushId);
     this.index = index;
     this.depthBits = sampleData.depth;
     this.width = sampleData.right - sampleData.left;
@@ -48,13 +116,18 @@ export class AbrSampleBrush {
     this.encodedBitmap = sampleData.bitmap;
   }
 
+  setBrushData(data) {
+    this.brushData = data;
+    this.brushName = data["Nm  "];
+  }
+
   getDecodeOptions() {
     return {
       data: this.encodedBitmap,
       isCompressed: this.isCompressed,
       depthBits: this.depthBits,
       width: this.width,
-      height: this.height
+      height: this.height,
     };
   }
 
@@ -72,7 +145,9 @@ export class AbrSampleBrush {
 
   createBlobURL() {
     this.createPNG();
-    this.url = URL.createObjectURL(new Blob([this.pngData], { type: 'image/png' }));
+    this.url = URL.createObjectURL(
+      new Blob([this.pngData], { type: "image/png" })
+    );
     return this.url;
   }
 
