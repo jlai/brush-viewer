@@ -54,8 +54,55 @@ types:
         type: u1
       - id: brush_id
         size: id_len
+      - id: body_v62
+        type: v62
+        if: _root.header.subversion == 2
+      - id: body_v61
+        type: v61
+        if: _root.header.subversion == 1
+        
+  v61:
+    seq:
       - id: unknown
-        size: 264
+        size: 10
+      - id: image_data
+        type: image_data
+
+  v62:
+    seq:
+      - id: meta_len
+        type: u2
+      - id: meta_a
+        type: u2
+      - id: version
+        type: u4
+      - id: length
+        type: u4
+      - id: bounds
+        size: 16
+      - id: num_channels
+        type: u4
+      - id: channels
+        type: channel
+        repeat: expr
+        repeat-expr: num_channels
+  
+  channel:
+    seq:
+      - id: is_written
+        type: u4
+      - id: length
+        type: u4
+        if: is_written > 0
+      - id: unused_depth
+        type: u4
+        if: is_written > 0 and length > 0
+      - id: image_data
+        type: image_data
+        if: is_written > 0 and length > 0
+  
+  image_data:
+    seq:
       - id: top
         type: u4
       - id: left
@@ -70,7 +117,7 @@ types:
         type: u1
       - id: bitmap
         size-eos: true
-        
+  
   descriptors_section_body:
     seq:
       - id: unknown

@@ -33,7 +33,20 @@ export class AbrBrushFile {
       if (section.body instanceof Abr.SamplesSectionBody) {
         const samplesData = section.body.samples;
         for (let i = 0; i < samplesData.length; i++) {
-          const sample = new AbrSampleBrush(samplesData[i].data, i);
+          const sampleData = samplesData[i].data;
+
+          let imageData;
+          if (sampleData.bodyV61) {
+            imageData = sampleData.bodyV61.imageData;
+          } else {
+            imageData = sampleData.bodyV62.channels.filter((channel) => channel.imageData)[0]?.imageData;
+          }
+
+          const sample = new AbrSampleBrush(
+              sampleData.brushId,
+              imageData,
+              i,
+            );
           this.samplesById.set(sample.brushId, sample);
           this.samples.push(sample);
         }
@@ -104,16 +117,16 @@ export class AbrBrushFile {
 const ASCII_DECODER = new TextDecoder("ASCII");
 
 export class AbrSampleBrush {
-  constructor(sampleData, index) {
+  constructor(brushId, imageData, index) {
     this.brushData = {};
     this.brushName = undefined;
-    this.brushId = ASCII_DECODER.decode(sampleData.brushId);
+    this.brushId = ASCII_DECODER.decode(brushId);
     this.index = index;
-    this.depthBits = sampleData.depth;
-    this.width = sampleData.right - sampleData.left;
-    this.height = sampleData.bottom - sampleData.top;
-    this.isCompressed = sampleData.compression === 1;
-    this.encodedBitmap = sampleData.bitmap;
+    this.depthBits = imageData.depth;
+    this.width = imageData.right - imageData.left;
+    this.height = imageData.bottom - imageData.top;
+    this.isCompressed = imageData.compression === 1;
+    this.encodedBitmap = imageData.bitmap;
   }
 
   setBrushData(data) {

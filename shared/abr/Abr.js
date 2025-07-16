@@ -83,6 +83,30 @@ var Abr = (function() {
     }
   }
 
+  var Channel = Abr.Channel = (function() {
+    function Channel(_io, _parent, _root) {
+      this._io = _io;
+      this._parent = _parent;
+      this._root = _root || this;
+
+      this._read();
+    }
+    Channel.prototype._read = function() {
+      this.isWritten = this._io.readU4be();
+      if (this.isWritten > 0) {
+        this.length = this._io.readU4be();
+      }
+      if ( ((this.isWritten > 0) && (this.length > 0)) ) {
+        this.unusedDepth = this._io.readU4be();
+      }
+      if ( ((this.isWritten > 0) && (this.length > 0)) ) {
+        this.imageData = new ImageData(this._io, this, this._root);
+      }
+    }
+
+    return Channel;
+  })();
+
   var DescriptorList = Abr.DescriptorList = (function() {
     function DescriptorList(_io, _parent, _root) {
       this._io = _io;
@@ -100,6 +124,27 @@ var Abr = (function() {
     }
 
     return DescriptorList;
+  })();
+
+  var ImageData = Abr.ImageData = (function() {
+    function ImageData(_io, _parent, _root) {
+      this._io = _io;
+      this._parent = _parent;
+      this._root = _root || this;
+
+      this._read();
+    }
+    ImageData.prototype._read = function() {
+      this.top = this._io.readU4be();
+      this.left = this._io.readU4be();
+      this.bottom = this._io.readU4be();
+      this.right = this._io.readU4be();
+      this.depth = this._io.readU2be();
+      this.compression = this._io.readU1();
+      this.bitmap = this._io.readBytesFull();
+    }
+
+    return ImageData;
   })();
 
   var TypedValue = Abr.TypedValue = (function() {
@@ -286,17 +331,39 @@ var Abr = (function() {
     SampleData.prototype._read = function() {
       this.idLen = this._io.readU1();
       this.brushId = this._io.readBytes(this.idLen);
-      this.unknown = this._io.readBytes(264);
-      this.top = this._io.readU4be();
-      this.left = this._io.readU4be();
-      this.bottom = this._io.readU4be();
-      this.right = this._io.readU4be();
-      this.depth = this._io.readU2be();
-      this.compression = this._io.readU1();
-      this.bitmap = this._io.readBytesFull();
+      if (this._root.header.subversion == 2) {
+        this.bodyV62 = new V62(this._io, this, this._root);
+      }
+      if (this._root.header.subversion == 1) {
+        this.bodyV61 = new V61(this._io, this, this._root);
+      }
     }
 
     return SampleData;
+  })();
+
+  var V62 = Abr.V62 = (function() {
+    function V62(_io, _parent, _root) {
+      this._io = _io;
+      this._parent = _parent;
+      this._root = _root || this;
+
+      this._read();
+    }
+    V62.prototype._read = function() {
+      this.metaLen = this._io.readU2be();
+      this.metaA = this._io.readU2be();
+      this.version = this._io.readU4be();
+      this.length = this._io.readU4be();
+      this.bounds = this._io.readBytes(16);
+      this.numChannels = this._io.readU4be();
+      this.channels = [];
+      for (var i = 0; i < this.numChannels; i++) {
+        this.channels.push(new Channel(this._io, this, this._root));
+      }
+    }
+
+    return V62;
   })();
 
   var HierarchiesSectionBody = Abr.HierarchiesSectionBody = (function() {
@@ -415,6 +482,22 @@ var Abr = (function() {
     }
 
     return AliasValue;
+  })();
+
+  var V61 = Abr.V61 = (function() {
+    function V61(_io, _parent, _root) {
+      this._io = _io;
+      this._parent = _parent;
+      this._root = _root || this;
+
+      this._read();
+    }
+    V61.prototype._read = function() {
+      this.unknown = this._io.readBytes(10);
+      this.imageData = new ImageData(this._io, this, this._root);
+    }
+
+    return V61;
   })();
 
   var UnitFloatValue = Abr.UnitFloatValue = (function() {
